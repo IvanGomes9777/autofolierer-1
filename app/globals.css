@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --noir: #080808; /* Haupt-Hintergrund */
+  --anthracite: #15130f; /* warme Panels/Sektionen */
+  --gold: #c2a45c; /* Champagner-Gold, Akzent & Linien */
+  --gold-soft: #d8be84; /* heller Gold-Hover */
+  --platinum: #e5e4e2; /* zweites Metall, sekundär */
+  --paper: #edeae3; /* gebrochenes Weiß, Fließtext */
+  --paper-dim: #9c988e; /* gedämpfter Text, Captions */
+  --line: rgba(194, 164, 92, 0.22); /* Gold-Haarlinien */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--noir);
+    color: var(--paper);
+    font-family: var(--font-body), sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), serif;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+
+  ::selection {
+    background-color: var(--gold);
+    color: var(--noir);
+  }
+
+  /* Sichtbarer Keyboard-Fokus (WCAG 2.1 AA) */
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* Maus-Fokus dezent halten */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@layer components {
+  .container-content {
+    width: 100%;
+    max-width: var(--max, 1200px);
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, 3rem);
+  }
+
+  .eyebrow {
+    font-family: var(--font-body), sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.78rem;
+    color: var(--gold);
+  }
+
+  .section-gap {
+    padding-block: clamp(6rem, 12vh, 10rem);
+  }
+
+  /* Satin-Lack-Oberfläche für den Hero */
+  .satin-base {
+    background:
+      radial-gradient(
+        120% 90% at 50% 0%,
+        rgba(194, 164, 92, 0.08) 0%,
+        transparent 55%
+      ),
+      linear-gradient(180deg, #0b0b0b 0%, #080808 60%, #060606 100%);
+  }
+
+  .satin-sweep {
+    position: absolute;
+    inset: -20% -10%;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(229, 228, 226, 0.06) 46%,
+      rgba(216, 190, 132, 0.16) 50%,
+      rgba(229, 228, 226, 0.06) 54%,
+      transparent 65%
+    );
+    filter: blur(2px);
+    pointer-events: none;
+  }
+}
+
+/* Signature: Gold-Haarlinie, die sich beim Scrollen zeichnet */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold) 12%,
+    var(--gold) 88%,
+    transparent
+  );
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gold-line.is-drawn {
+  transform: scaleX(1);
+}
+
+/* Reveal-Animation beim Scrollen */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Monogramm-Unterstreichung, die sich beim Laden zeichnet */
+.monogram-underline {
+  position: relative;
+}
+
+.monogram-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 100%;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: draw-underline 1.4s 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes draw-underline {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* prefers-reduced-motion: alle Bewegungen abschalten */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gold-line {
+    transform: scaleX(1);
+  }
+}
