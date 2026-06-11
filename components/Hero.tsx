@@ -8,6 +8,7 @@ import {
   useReducedMotion,
   type Variants,
 } from 'framer-motion';
+import { useGyroTilt } from './motion/useGyroTilt';
 import { site } from '@/lib/site';
 
 const container: Variants = {
@@ -40,6 +41,9 @@ export function Hero() {
   const sy = useSpring(my, { stiffness: 60, damping: 18 });
   const rotX = useTransform(sy, [-0.5, 0.5], [3, -3]);
   const rotY = useTransform(sx, [-0.5, 0.5], [-3.5, 3.5]);
+
+  // Mobile: gleiche 3D-Neigung per Gyroskop
+  useGyroTilt(mx, my);
 
   const onMouse = (e: React.MouseEvent) => {
     if (reduce) return;

@@ -9,23 +9,28 @@ import {
 } from 'framer-motion';
 
 /**
- * Sticky-Stack-Übergang: Der Hero bleibt gepinnt, während die nächste
- * Section (over) mit Tiefe darüber gleitet. Der Hero skaliert dabei leicht
- * zurück und dunkelt ab — cinematischer Sektionswechsel.
+ * Zoom-Through-Übergang: Der Hero bleibt gepinnt und „zoomt durch" —
+ * er skaliert auf, verblasst und blurrt leicht, während die nächste Section
+ * (over) aus der Tiefe auftaucht und hochgleitet. Cinematischer Sektionswechsel.
  */
 export function HeroStack({ hero, over }: { hero: ReactNode; over: ReactNode }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: p } = useScroll({
     target: ref,
     offset: ['start start', 'end end'],
   });
 
-  // Übergang spielt in der ersten Hälfte (während „over" hochgleitet)
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.92]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.5]);
-  const dim = useTransform(scrollYProgress, [0, 0.5], [0, 0.7]);
+  // Hero „durchfliegen"
+  const heroScale = useTransform(p, [0, 0.5], [1, 1.6]);
+  const heroOpacity = useTransform(p, [0.12, 0.5], [1, 0]);
+  const blurNum = useTransform(p, [0.1, 0.5], [0, 6], { clamp: true });
+  const heroFilter = useTransform(blurNum, (v) => `blur(${v}px)`);
+
+  // Nächste Section taucht aus der Tiefe auf
+  const overScale = useTransform(p, [0, 0.5], [1.12, 1]);
+  const overOpacity = useTransform(p, [0, 0.22], [0.15, 1]);
 
   if (reduce) {
     return (
@@ -40,22 +45,20 @@ export function HeroStack({ hero, over }: { hero: ReactNode; over: ReactNode }) 
     <div ref={ref} className="relative">
       <div className="sticky top-0 z-0 h-[100svh] overflow-hidden">
         <motion.div
-          style={{ scale, opacity }}
+          style={{ scale: heroScale, opacity: heroOpacity, filter: heroFilter }}
           className="h-full w-full origin-center will-change-transform"
         >
           {hero}
         </motion.div>
-        <motion.div
-          aria-hidden="true"
-          style={{ opacity: dim }}
-          className="pointer-events-none absolute inset-0 bg-black"
-        />
       </div>
 
-      {/* Gleitet mit Tiefe über den Hero */}
-      <div className="relative z-10 shadow-[0_-40px_80px_-20px_rgba(0,0,0,0.9)]">
+      {/* Taucht aus der Tiefe auf und gleitet über den Hero */}
+      <motion.div
+        style={{ scale: overScale, opacity: overOpacity }}
+        className="relative z-10 origin-center will-change-transform"
+      >
         {over}
-      </div>
+      </motion.div>
     </div>
   );
 }
