@@ -1,24 +1,40 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Jost } from 'next/font/google';
+import {
+  Anton,
+  Playfair_Display,
+  Montserrat,
+  Sora,
+  Bebas_Neue,
+  Inter,
+  Jost,
+  Open_Sans,
+  Roboto_Condensed,
+} from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 import { CookieBanner } from '@/components/CookieBanner';
 import { site } from '@/lib/site';
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-display',
-  display: 'swap',
-});
+const anton = Anton({ subsets: ['latin'], weight: '400', variable: '--font-anton', display: 'swap' });
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-playfair', display: 'swap' });
+const montserrat = Montserrat({ subsets: ['latin'], weight: ['400', '600', '700', '800'], variable: '--font-montserrat', display: 'swap' });
+const sora = Sora({ subsets: ['latin'], weight: ['400', '600', '700', '800'], variable: '--font-sora', display: 'swap' });
+const bebas = Bebas_Neue({ subsets: ['latin'], weight: '400', variable: '--font-bebas', display: 'swap' });
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-inter', display: 'swap' });
+const jost = Jost({ subsets: ['latin'], weight: ['300', '400', '500'], variable: '--font-jost', display: 'swap' });
+const openSans = Open_Sans({ subsets: ['latin'], weight: ['400', '600', '700'], variable: '--font-opensans', display: 'swap' });
+const robotoCond = Roboto_Condensed({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-roboto-cond', display: 'swap' });
 
-const jost = Jost({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-body',
-  display: 'swap',
-});
+const fontVars = [
+  anton.variable,
+  playfair.variable,
+  montserrat.variable,
+  sora.variable,
+  bebas.variable,
+  inter.variable,
+  jost.variable,
+  openSans.variable,
+  robotoCond.variable,
+].join(' ');
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -27,13 +43,14 @@ export const metadata: Metadata = {
     template: '%s | GV Werbetechnik',
   },
   description:
-    'Premium-Fahrzeugfolierung in Münster. Vollfolierung, Lackschutzfolie (PPF), Chrome-Delete & Werbebeschriftung — präzise verarbeitet, werterhaltend, rückstandslos entfernbar.',
+    'Premium-Fahrzeugfolierung in Münster. Vollfolierung, Farbwechsel, Lackschutzfolie (PPF), Chrome-Delete & Werbebeschriftung — werterhaltend, rückstandslos entfernbar.',
   keywords: [
     'Fahrzeugfolierung Münster',
     'Auto folieren Münster',
     'Vollfolierung',
-    'Lackschutzfolie PPF Münster',
     'Carwrapping Münster',
+    'Lackschutzfolie PPF Münster',
+    'Werbebeschriftung Münster',
   ],
   openGraph: {
     type: 'website',
@@ -42,8 +59,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: 'Fahrzeugfolierung Münster | GV Werbetechnik',
     description:
-      'Premium-Folierung für anspruchsvolle Fahrzeuge — präzise verarbeitet, werterhaltend, rückstandslos entfernbar.',
-    // TODO: OG-Image ergänzen (Platzhalter)
+      'Premium-Folierung & Farbwechsel — werterhaltend, rückstandslos entfernbar. Studio in Münster.',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
   },
   robots: { index: true, follow: true },
@@ -89,7 +105,6 @@ function LocalBusinessJsonLd() {
     },
     sameAs: [site.instagram.url],
   };
-
   return (
     <script
       type="application/ld+json"
@@ -102,17 +117,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="de" className={`${playfair.variable} ${jost.variable}`}>
-      <body>
+    <html lang="de" className={fontVars}>
+      <body className="font-inter">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-gold focus:px-4 focus:py-2 focus:text-noir"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2 focus:text-black"
         >
           Zum Inhalt springen
         </a>
-        <Navbar />
         <main id="main">{children}</main>
-        <Footer />
         <CookieBanner />
         <LocalBusinessJsonLd />
       </body>
