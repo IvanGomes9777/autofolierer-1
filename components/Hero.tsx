@@ -28,34 +28,31 @@ const item: Variants = {
 
 /**
  * HERO — Layout A (Lower-Third), cinematic + Premium-Motion.
- * - Scroll-Parallax: Szene-Ebenen bewegen sich unterschiedlich schnell (Tiefe)
- * - Maus-3D-Tilt: die Studio-Szene neigt sich leicht zur Maus
+ * Vollbild-Hero-Video (object-cover) als Hintergrund, klar sichtbar.
+ * - Scroll-Parallax + sanfter Maus-3D-Tilt am Video (Overscale verhindert Ränder)
  * - Gestaffelter Entrance der Headline/CTAs
- * TODO: Hero-Video von Ivan einsetzen (Vollbild-<video>-Slot vorbereitet).
+ * - Studio-Szene (CSS) liegt als Fallback hinter dem Video.
  */
 export function Hero() {
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Scroll-Parallax
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', '16%']);
-  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const sceneY = useTransform(scrollYProgress, [0, 1], ['0%', '14%']);
+  const sceneScale = useTransform(scrollYProgress, [0, 1], [1.08, 1.2]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
-  // Maus-Parallax / 3D-Tilt
+  // Maus-3D-Tilt (dezent; Overscale hält die Videoränder verdeckt)
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const sx = useSpring(mx, { stiffness: 60, damping: 18 });
   const sy = useSpring(my, { stiffness: 60, damping: 18 });
-  const rotX = useTransform(sy, [-0.5, 0.5], [4, -4]);
-  const rotY = useTransform(sx, [-0.5, 0.5], [-6, 6]);
-  const carX = useTransform(sx, [-0.5, 0.5], [26, -26]);
-  const spotX = useTransform(sx, [-0.5, 0.5], [-18, 18]);
+  const rotX = useTransform(sy, [-0.5, 0.5], [3, -3]);
+  const rotY = useTransform(sx, [-0.5, 0.5], [-3.5, 3.5]);
 
   const onMouse = (e: React.MouseEvent) => {
     if (reduce) return;
@@ -70,57 +67,51 @@ export function Hero() {
       ref={sectionRef}
       onMouseMove={onMouse}
       aria-label="Einleitung"
-      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden"
+      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden bg-noir"
     >
-      {/* ---- Video-Slot + Studio-Szene-Platzhalter (parallax + 3D-tilt) ---- */}
+      {/* ---- Vollbild-Hero-Video (parallax + 3D-tilt) ---- */}
       <motion.div
         className="absolute inset-0"
         style={{
           y: reduce ? 0 : sceneY,
-          scale: reduce ? 1 : sceneScale,
+          scale: reduce ? 1.06 : sceneScale,
           rotateX: reduce ? 0 : rotX,
           rotateY: reduce ? 0 : rotY,
           transformPerspective: 1200,
         }}
       >
-        {/*
-          TODO: Hero-Video:
-          <video className="absolute inset-0 h-full w-full object-cover"
-            autoPlay muted loop playsInline poster="/hero-poster.jpg">
-            <source src="/hero.webm" type="video/webm" />
-            <source src="/hero.mp4" type="video/mp4" />
-          </video>
-        */}
+        {/* Fallback-Szene hinter dem Video (deckt Ladezeit / Fehlerfall ab) */}
         <div className="hero-scene" aria-hidden="true">
-          <motion.div className="hero-spot" style={{ x: reduce ? 0 : spotX }} />
+          <div className="hero-spot" />
           <div className="hero-haze" />
-          <motion.div className="hero-car" style={{ x: reduce ? 0 : carX }}>
-            <div className="hero-cabin" />
-            <div className="hero-glass" />
-            <div className="hero-body" />
-            <div className="hero-wheel" style={{ left: '12%' }} />
-            <div className="hero-wheel" style={{ right: '12%' }} />
-            <div className="hero-rim" />
-          </motion.div>
           <div className="hero-floor" />
-          <div className="hero-grain" />
         </div>
+
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Leichtes Korn für cinematischen Look */}
+        <div className="hero-grain" aria-hidden="true" />
       </motion.div>
 
-      {/* Lokale Scrims */}
+      {/* Lokale Scrims: oben Navbar, unten Text-Lesbarkeit */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/55 to-transparent"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-black/80 via-black/45 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] bg-gradient-to-t from-black/85 via-black/45 to-transparent"
       />
-
-      {/* Video-Hinweis (entfällt mit echtem Video) */}
-      <span className="absolute left-1/2 top-[6.5rem] z-10 -translate-x-1/2 rounded-full border border-line bg-black/30 px-3 py-1.5 text-[0.6rem] uppercase tracking-[0.2em] text-paper-dim sm:left-[clamp(1.25rem,5vw,3.5rem)] sm:translate-x-0">
-        ▶ Hero-Video folgt
-      </span>
 
       {/* ---- Lower-Third Content (stagger entrance + scroll fade) ---- */}
       <motion.div
@@ -140,7 +131,7 @@ export function Hero() {
             </motion.p>
             <motion.h1
               variants={item}
-              className="mt-5 font-playfair text-[clamp(2.6rem,6.2vw,5rem)] font-medium leading-[1.02] text-paper"
+              className="mt-5 font-playfair text-[clamp(2.6rem,6.2vw,5rem)] font-medium leading-[1.02] text-paper [text-shadow:0_2px_30px_rgba(0,0,0,0.55)]"
             >
               Vollendung in jedem Detail.
             </motion.h1>
