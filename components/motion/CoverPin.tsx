@@ -9,36 +9,75 @@ import {
 } from 'framer-motion';
 
 /**
- * Einheitlicher Zoom-Through-Sektionsübergang (wie Hero → Studio):
- * Die Section wird gepinnt, sobald sie fertig gescrollt ist; die nächste
- * Section schiebt sich darüber, während die gepinnte aufzoomt, verblasst
- * und leicht blurrt.
+ * Cinematischer Sektionsübergang. Die Section wird gepinnt, sobald sie fertig
+ * gescrollt ist; die nächste Section schiebt sich darüber.
  *
- * Funktioniert auch für Sections, die höher als der Viewport sind:
- * der Sticky-Offset wird per ResizeObserver so gesetzt, dass die Section
- * erst komplett durchgescrollt wird und dann mit der Unterkante pinnt.
+ * Zwei Varianten:
+ *  - 'zoom'  (Standard): die gepinnte Section zoomt auf, verblasst und blurrt,
+ *            die nächste taucht aus der Tiefe auf (Zoom-Through).
+ *  - 'wipe'  : die gepinnte Section skaliert leicht zurück und dunkelt ab,
+ *            während die nächste mit Tiefe darüber gleitet (Wipe — wie
+ *            ursprünglich Hero → Studio).
+ *
+ * Mobile-stabil: Die maßgebliche Viewport-Höhe wird einmal gemessen und nur
+ * bei echten Breiten-/Orientierungswechseln neu berechnet — NICHT bei den
+ * laufenden Höhenänderungen durch die ein-/ausblendende Adressleiste. Dadurch
+ * bleibt das Scroll-Ziel (Runway) während des Scrollens konstant und die
+ * Übergänge glitchen nicht mehr.
  */
-export function CoverPin({ children, z = 0 }: { children: ReactNode; z?: number }) {
+export function CoverPin({
+  children,
+  z = 0,
+  variant = 'zoom',
+  className,
+}: {
+  children: ReactNode;
+  z?: number;
+  variant?: 'zoom' | 'wipe';
+  className?: string;
+}) {
   const reduce = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  const lastWidth = useRef(0);
+  const [vh, setVh] = useState(0);
   const [top, setTop] = useState(0);
 
   useEffect(() => {
     const el = stickyRef.current;
     if (!el) return;
-    const update = () => {
-      // Section kleiner/gleich Viewport: pin bei top 0.
-      // Größer: negativer Offset, sodass die Unterkante pinnt.
+
+    // top so setzen, dass Sections <= Viewport bei 0 pinnen und höhere
+    // Sections erst komplett durchscrollen (negativer Offset).
+    const recomputeTop = () => {
       setTop(Math.min(0, window.innerHeight - el.offsetHeight));
     };
-    update();
-    const ro = new ResizeObserver(update);
+    // Stabile Viewport-Höhe (Runway) — nur bei Breiten-/Orientierungswechsel.
+    const recomputeVh = () => {
+      setVh(window.innerHeight);
+      recomputeTop();
+    };
+
+    recomputeVh();
+    lastWidth.current = window.innerWidth;
+
+    // Element-Größe (Inhalt/Orientierung) → top anpassen, aber Runway-Höhe
+    // bleibt stabil, solange die Breite gleich ist.
+    const ro = new ResizeObserver(recomputeTop);
     ro.observe(el);
-    window.addEventListener('resize', update);
+
+    const onResize = () => {
+      // Nur echte Breiten-/Orientierungsänderungen; reine Höhenänderungen
+      // (Adressleiste) ignorieren → kein Springen während des Scrollens.
+      if (window.innerWidth !== lastWidth.current) {
+        lastWidth.current = window.innerWidth;
+        recomputeVh();
+      }
+    };
+    window.addEventListener('resize', onResize);
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -48,32 +87,51 @@ export function CoverPin({ children, z = 0 }: { children: ReactNode; z?: number 
     offset: ['end 200%', 'end 100%'],
   });
 
-  const scale = useTransform(p, [0, 1], [1, 1.45]);
-  const opacity = useTransform(p, [0.1, 0.85], [1, 0]);
+  // Zoom-Through
+  const zoomScale = useTransform(p, [0, 1], [1, 1.45]);
+  const zoomOpacity = useTransform(p, [0.1, 0.85], [1, 0]);
   const blurNum = useTransform(p, [0.1, 0.9], [0, 6], { clamp: true });
-  const filter = useTransform(blurNum, (v) => `blur(${v}px)`);
+  const zoomFilter = useTransform(blurNum, (v) => `blur(${v}px)`);
+
+  // Wipe: leicht zurückskalieren + abdunkeln, nächste Section gleitet darüber
+  const wipeScale = useTransform(p, [0, 0.9], [1, 0.92]);
+  const wipeOpacity = useTransform(p, [0, 0.9], [1, 0.5]);
+  const dim = useTransform(p, [0, 0.9], [0, 0.7]);
 
   if (reduce) {
     return (
-      <div className="relative" style={{ zIndex: z }}>
+      <div className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
         {children}
       </div>
     );
   }
 
+  const isWipe = variant === 'wipe';
+
   return (
-    <div ref={containerRef} className="relative" style={{ zIndex: z }}>
+    <div ref={containerRef} className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
       {/* Sticky-Fenster klippt das skalierte Innere (kein Horizontal-Overflow) */}
       <div ref={stickyRef} className="sticky overflow-hidden" style={{ top }}>
         <motion.div
-          className="will-change-transform"
-          style={{ scale, opacity, filter, transformOrigin: 'center center' }}
+          className="will-change-transform [backface-visibility:hidden] [transform:translateZ(0)]"
+          style={
+            isWipe
+              ? { scale: wipeScale, opacity: wipeOpacity, transformOrigin: 'center center' }
+              : { scale: zoomScale, opacity: zoomOpacity, filter: zoomFilter, transformOrigin: 'center center' }
+          }
         >
           {children}
         </motion.div>
+        {isWipe && (
+          <motion.div
+            aria-hidden="true"
+            style={{ opacity: dim }}
+            className="pointer-events-none absolute inset-0 bg-black"
+          />
+        )}
       </div>
-      {/* Cover-Runway: währenddessen schiebt sich die nächste Section darüber */}
-      <div className="h-[100dvh]" aria-hidden="true" />
+      {/* Cover-Runway: feste px-Höhe (mobil stabil, kein dvh-Resize beim Scrollen) */}
+      <div style={{ height: vh ? vh : undefined }} className={vh ? '' : 'h-[100svh]'} aria-hidden="true" />
     </div>
   );
 }
