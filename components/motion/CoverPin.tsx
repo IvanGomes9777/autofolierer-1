@@ -19,9 +19,11 @@ import {
  *            während die nächste mit Tiefe darüber gleitet (Wipe — wie
  *            ursprünglich Hero → Studio).
  *
- * Funktioniert auch für Sections, die höher als der Viewport sind:
- * der Sticky-Offset wird per ResizeObserver so gesetzt, dass die Section
- * erst komplett durchgescrollt wird und dann mit der Unterkante pinnt.
+ * Mobile-stabil: Die maßgebliche Viewport-Höhe wird einmal gemessen und nur
+ * bei echten Breiten-/Orientierungswechseln neu berechnet — NICHT bei den
+ * laufenden Höhenänderungen durch die ein-/ausblendende Adressleiste. Dadurch
+ * bleibt das Scroll-Ziel (Runway) während des Scrollens konstant und die
+ * Übergänge glitchen nicht mehr.
  */
 export function CoverPin({
   children,
@@ -37,23 +39,45 @@ export function CoverPin({
   const reduce = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  const lastWidth = useRef(0);
+  const [vh, setVh] = useState(0);
   const [top, setTop] = useState(0);
 
   useEffect(() => {
     const el = stickyRef.current;
     if (!el) return;
-    const update = () => {
-      // Section kleiner/gleich Viewport: pin bei top 0.
-      // Größer: negativer Offset, sodass die Unterkante pinnt.
+
+    // top so setzen, dass Sections <= Viewport bei 0 pinnen und höhere
+    // Sections erst komplett durchscrollen (negativer Offset).
+    const recomputeTop = () => {
       setTop(Math.min(0, window.innerHeight - el.offsetHeight));
     };
-    update();
-    const ro = new ResizeObserver(update);
+    // Stabile Viewport-Höhe (Runway) — nur bei Breiten-/Orientierungswechsel.
+    const recomputeVh = () => {
+      setVh(window.innerHeight);
+      recomputeTop();
+    };
+
+    recomputeVh();
+    lastWidth.current = window.innerWidth;
+
+    // Element-Größe (Inhalt/Orientierung) → top anpassen, aber Runway-Höhe
+    // bleibt stabil, solange die Breite gleich ist.
+    const ro = new ResizeObserver(recomputeTop);
     ro.observe(el);
-    window.addEventListener('resize', update);
+
+    const onResize = () => {
+      // Nur echte Breiten-/Orientierungsänderungen; reine Höhenänderungen
+      // (Adressleiste) ignorieren → kein Springen während des Scrollens.
+      if (window.innerWidth !== lastWidth.current) {
+        lastWidth.current = window.innerWidth;
+        recomputeVh();
+      }
+    };
+    window.addEventListener('resize', onResize);
     return () => {
       ro.disconnect();
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -76,7 +100,7 @@ export function CoverPin({
 
   if (reduce) {
     return (
-      <div className="relative" style={{ zIndex: z }}>
+      <div className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
         {children}
       </div>
     );
@@ -89,7 +113,7 @@ export function CoverPin({
       {/* Sticky-Fenster klippt das skalierte Innere (kein Horizontal-Overflow) */}
       <div ref={stickyRef} className="sticky overflow-hidden" style={{ top }}>
         <motion.div
-          className="will-change-transform"
+          className="will-change-transform [backface-visibility:hidden] [transform:translateZ(0)]"
           style={
             isWipe
               ? { scale: wipeScale, opacity: wipeOpacity, transformOrigin: 'center center' }
@@ -106,8 +130,8 @@ export function CoverPin({
           />
         )}
       </div>
-      {/* Cover-Runway: währenddessen schiebt sich die nächste Section darüber */}
-      <div className="h-[100dvh]" aria-hidden="true" />
+      {/* Cover-Runway: feste px-Höhe (mobil stabil, kein dvh-Resize beim Scrollen) */}
+      <div style={{ height: vh ? vh : undefined }} className={vh ? '' : 'h-[100svh]'} aria-hidden="true" />
     </div>
   );
 }
