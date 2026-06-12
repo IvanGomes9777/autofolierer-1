@@ -8,8 +8,8 @@ import Lenis from 'lenis';
  * Respektiert prefers-reduced-motion (dann nativer Scroll, kein Lerp).
  *
  * Am Handy/Tablet (< lg) zusätzlich Sektions-Navigation: Eine Wischgeste trägt
- * direkt zur nächsten Sektion — der Finger führt die Seite flüssig mit
- * (Lenis syncTouch), beim Loslassen wird genau eine Sektion weiter eingerastet.
+ * direkt zur nächsten Sektion — beim Loslassen wird genau eine Sektion weiter
+ * eingerastet. Touch bleibt nativ, damit Safaris Bottom-Leiste einklappen kann.
  */
 export function SmoothScroll() {
   useEffect(() => {
@@ -21,11 +21,10 @@ export function SmoothScroll() {
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      // Mobil: Lenis steuert die Touch-Bewegung (führt den Finger flüssig mit)
-      // — Voraussetzung dafür, dass wir beim Loslassen sauber einrasten können,
-      // ohne gegen den nativen Fling zu kämpfen.
-      syncTouch: isMobile,
-      syncTouchLerp: 0.1,
+      // syncTouch bewusst AUS: Touch bleibt nativ. Damit kann Safaris untere
+      // Navigationsleiste beim Scrollen wie gewohnt einklappen (sonst bliebe sie
+      // in voller Höhe stehen und verdeckt Inhalt). Das „eine Wischgeste = eine
+      // Sektion" wird über touchend gesteuert und funktioniert auch nativ.
       touchMultiplier: 1.6,
     });
 
