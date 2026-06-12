@@ -18,10 +18,11 @@ eingepflegt (`lib/site.ts`).
 - [ ] **Hero-Video** von Ivan einsetzen — Slot in `components/Hero.tsx`
       (`{/* TODO: Hero-Video von Ivan einsetzen */}`). Container ist bereits
       auf `object-fit: cover` vorbereitet; aktuell Satin-Licht-Sweep (CSS).
-- [ ] **Vorher/Nachher-Fotos** (Section „Ergebnisse") einsetzen — aktuell
-      rechtssichere CSS-Platzhalter pro Bereich in `lib/content.ts`
-      (`showcaseScenes`). Echte Vorher/Nachher-Fotopaare ergänzen (DSGVO:
-      Kennzeichen unkenntlich machen).
+- [ ] **Vorher/Nachher-Fotos** (Section „Ergebnisse") — **Fahrzeug** nutzt jetzt
+      echte Fotos (`public/showcase/fahrzeug-{vorher,nachher}.webp`). Noch offen:
+      Lichtwerbung, Objektbeschriftung, Schilder (aktuell CSS-Platzhalter in
+      `showcaseScenes`). Echte Fotopaare ergänzen (DSGVO: Kennzeichen unkenntlich
+      machen — die GT3-RS-Kennzeichen ggf. ebenfalls prüfen).
 - [ ] **Zahlen bestätigen** (Section „Ergebnisse", `trustStats` in
       `lib/content.ts`) — `Jahre Erfahrung` und `Projekte umgesetzt` sind
       BEISPIEL-Platzhalter (`confirm: true`). 5,0★ Google ist verifiziert.
