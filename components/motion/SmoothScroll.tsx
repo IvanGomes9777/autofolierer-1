@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import Snap from 'lenis/snap';
 
 /**
  * Lenis Smooth-Scroll — die Basis für den „butterweichen" Premium-Look.
@@ -45,9 +46,34 @@ export function SmoothScroll() {
     };
     document.addEventListener('click', onClick);
 
+    // Section-Snapping NUR am Handy/Tablet (< lg). Sanftes „proximity"-Einrasten:
+    // die Seite rastet am Anfang jeder Sektion ein, wenn man in deren Nähe
+    // loslässt — blockiert aber nichts (lange Inhalte bleiben frei scrollbar).
+    // Snap-Punkte = Anfang jeder Sektion: die CoverPin-Container (Hero, Studio,
+    // Finishes — dort, wo die Sektion fertig gepinnt ist) plus die normalen
+    // Inhaltssektionen (#leistungen …). ignoreSticky/ignoreTransform, damit der
+    // Sticky-/Skalier-Aufbau der CoverPins die berechnete Position nicht verzerrt.
+    let snap: Snap | undefined;
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      snap = new Snap(lenis, { type: 'proximity' });
+      const targets = new Set<HTMLElement>(
+        Array.from(document.querySelectorAll<HTMLElement>('[data-coverpin]')),
+      );
+      const leistungen = document.getElementById('leistungen');
+      if (leistungen) targets.add(leistungen);
+      targets.forEach((el) =>
+        snap!.addElement(el, {
+          align: 'start',
+          ignoreSticky: true,
+          ignoreTransform: true,
+        }),
+      );
+    }
+
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener('click', onClick);
+      snap?.destroy();
       lenis.destroy();
     };
   }, []);
