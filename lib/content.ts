@@ -35,8 +35,8 @@ export const showcaseScenes: ShowcaseScene[] = [
     accent: '#9aa6b5',
     surface:
       'radial-gradient(120% 80% at 72% 8%, rgba(188,200,87,0.18), transparent 55%), linear-gradient(150deg,#33373f,#181a1f 58%,#0d0e11)',
-    beforeImg: '/showcase/fahrzeug-vorher.webp',
-    afterImg: '/showcase/fahrzeug-nachher.webp',
+    beforeImg: '/showcase/gt3rs-vorher.webp',
+    afterImg: '/showcase/gt3rs-nachher.webp',
   },
   {
     id: 'lichtwerbung',
@@ -55,6 +55,8 @@ export const showcaseScenes: ShowcaseScene[] = [
     accent: '#9fb0c4',
     surface:
       'linear-gradient(125deg, rgba(255,255,255,0.10) 0 2px, transparent 2px 9px), radial-gradient(90% 70% at 30% 20%, rgba(159,176,196,0.22), transparent 60%), linear-gradient(160deg,#1b1f24,#0c0e10)',
+    beforeImg: '/showcase/objekt-vorher.webp',
+    afterImg: '/showcase/objekt-nachher.webp',
   },
   {
     id: 'schild',
@@ -63,6 +65,8 @@ export const showcaseScenes: ShowcaseScene[] = [
     accent: '#bcc857',
     surface:
       'radial-gradient(100% 80% at 50% 30%, rgba(188,200,87,0.20), transparent 58%), linear-gradient(155deg,#22251a,#101209)',
+    beforeImg: '/showcase/schild-vorher.webp',
+    afterImg: '/showcase/schild-nachher.webp',
   },
 ];
 

@@ -19,11 +19,17 @@ eingepflegt (`lib/site.ts`).
       (`{/* TODO: Hero-Video von Ivan einsetzen */}`). Container ist bereits
       auf `object-fit: cover` vorbereitet; aktuell Satin-Licht-Sweep (CSS).
 - [ ] **Vorher/Nachher-Fotos** (Section „Ergebnisse"):
-      - **Fahrzeug** = echte Fotos (`public/showcase/fahrzeug-{vorher,nachher}.webp`).
+      - **Fahrzeug** = KI-generiertes Paar (`public/showcase/gt3rs-{vorher,nachher}.webp`,
+        weißer GT3 RS → satin-schwarz foliert). Bei Bedarf durch echte Aufnahme ersetzen.
       - **Lichtwerbung** = echtes Vorher-Foto + **KI-generiertes Nachher**
         (`lichtwerbung-nachher.webp`, beleuchtete „GV WERBETECHNIK"-Fassade).
         Bei Bedarf durch echtes Referenzprojekt ersetzen.
-      - Noch offen: Objektbeschriftung, Schilder (CSS-Platzhalter).
+      - **Objektbeschriftung** = KI-generiertes Paar (`objekt-{vorher,nachher}.webp`,
+        leeres Schaufenster → mit „GV WERBETECHNIK"-Folienbeschriftung).
+      - **Schilder & Werbung** = KI-generiertes Paar (`schild-{vorher,nachher}.webp`,
+        Eingang ohne Schild → mit montiertem „GV WERBETECHNIK"-Firmenschild).
+      - Alle 4 Szenen haben jetzt Vorher/Nachher-Bilder; Fahrzeug/Lichtwerbung/
+        Objekt/Schild sind KI-generiert → bei Bedarf durch echte Projekte ersetzen.
       - DSGVO: sichtbare Kennzeichen (GT3 RS) ggf. unkenntlich machen.
 - [ ] **Zahlen bestätigen** (Section „Ergebnisse", `trustStats` in
       `lib/content.ts`) — `Jahre Erfahrung` und `Projekte umgesetzt` sind
