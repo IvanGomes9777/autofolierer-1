@@ -34,7 +34,13 @@ export function SmoothScroll() {
       const el = document.querySelector(id);
       if (el) {
         e.preventDefault();
-        lenis.scrollTo(el as HTMLElement, { offset: -10 });
+        // Sektionen stecken in <CoverPin> (sticky + Runway). Die innere
+        // <section> liegt damit MITTEN in der gepinnten Übergangsphase — würde
+        // man sie direkt ansteuern, landet man „auf dem Übergang". Stattdessen
+        // den CoverPin-Container ansteuern: dessen Anfang ist genau die Position,
+        // an der die Sektion fertig gepinnt und voll sichtbar ist.
+        const pin = (el as HTMLElement).closest<HTMLElement>('[data-coverpin]');
+        lenis.scrollTo(pin ?? (el as HTMLElement), { offset: -10 });
       }
     };
     document.addEventListener('click', onClick);
