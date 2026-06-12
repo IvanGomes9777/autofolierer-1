@@ -100,7 +100,7 @@ export function CoverPin({
 
   if (reduce) {
     return (
-      <div className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
+      <div data-coverpin className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
         {children}
       </div>
     );
@@ -109,7 +109,7 @@ export function CoverPin({
   const isWipe = variant === 'wipe';
 
   return (
-    <div ref={containerRef} className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
+    <div ref={containerRef} data-coverpin className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
       {/* Sticky-Fenster klippt das skalierte Innere (kein Horizontal-Overflow) */}
       <div ref={stickyRef} className="sticky overflow-hidden" style={{ top }}>
         <motion.div

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import Snap from 'lenis/snap';
 
 /**
  * Lenis Smooth-Scroll — die Basis für den „butterweichen" Premium-Look.
@@ -34,14 +35,46 @@ export function SmoothScroll() {
       const el = document.querySelector(id);
       if (el) {
         e.preventDefault();
-        lenis.scrollTo(el as HTMLElement, { offset: -10 });
+        // Sektionen stecken in <CoverPin> (sticky + Runway). Die innere
+        // <section> liegt damit MITTEN in der gepinnten Übergangsphase — würde
+        // man sie direkt ansteuern, landet man „auf dem Übergang". Stattdessen
+        // den CoverPin-Container ansteuern: dessen Anfang ist genau die Position,
+        // an der die Sektion fertig gepinnt und voll sichtbar ist.
+        const pin = (el as HTMLElement).closest<HTMLElement>('[data-coverpin]');
+        lenis.scrollTo(pin ?? (el as HTMLElement), { offset: -10 });
       }
     };
     document.addEventListener('click', onClick);
 
+    // Section-Snapping NUR am Handy/Tablet (< lg). Festes „mandatory"-Einrasten:
+    // die Seite bleibt an JEDER Sektion verbindlich stehen — man kann nicht in
+    // einer Übergangsphase ruhen, jeder Scroll-Stopp landet sauber auf einer
+    // Sektion. Ein normaler Wisch trägt zur nächsten Sektion weiter.
+    // Snap-Punkte = Anfang jeder Sektion: die CoverPin-Container (Hero, Studio,
+    // Finishes — dort, wo die Sektion fertig gepinnt ist) plus die normalen
+    // Inhaltssektionen (#leistungen …). ignoreSticky/ignoreTransform, damit der
+    // Sticky-/Skalier-Aufbau der CoverPins die berechnete Position nicht verzerrt.
+    let snap: Snap | undefined;
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      snap = new Snap(lenis, { type: 'mandatory' });
+      const targets = new Set<HTMLElement>(
+        Array.from(document.querySelectorAll<HTMLElement>('[data-coverpin]')),
+      );
+      const leistungen = document.getElementById('leistungen');
+      if (leistungen) targets.add(leistungen);
+      targets.forEach((el) =>
+        snap!.addElement(el, {
+          align: 'start',
+          ignoreSticky: true,
+          ignoreTransform: true,
+        }),
+      );
+    }
+
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener('click', onClick);
+      snap?.destroy();
       lenis.destroy();
     };
   }, []);
