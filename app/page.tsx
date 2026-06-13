@@ -6,6 +6,7 @@ import { Leistungen } from '@/components/Leistungen';
 import { Portfolio } from '@/components/Portfolio';
 import { Rezension } from '@/components/Rezension';
 import { Kontakt } from '@/components/Kontakt';
+import { Footer } from '@/components/Footer';
 import { CoverPin } from '@/components/motion/CoverPin';
 
 export default function Home() {
@@ -40,11 +41,12 @@ export default function Home() {
       </CoverPin>
       <div className="relative z-[60]">
         <Kontakt />
+        <Footer />
       </div>
       {/*
-        Gebaut: ✓ Hero · ✓ Studio · ✓ Leistungen · ✓ Ergebnisse · ✓ Portfolio · ✓ Bewertung · ✓ Kontakt
+        Gebaut: ✓ Hero · ✓ Studio · ✓ Leistungen · ✓ Ergebnisse · ✓ Portfolio · ✓ Bewertung · ✓ Kontakt · ✓ Footer
         Übergänge: Zoom-Through-Stack zwischen allen Sections.
-        Nächste Section: Footer  (Ablauf bewusst weggelassen)
+        (Ablauf bewusst weggelassen.)
       */}
     </>
   );
