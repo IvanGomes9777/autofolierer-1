@@ -43,6 +43,19 @@ export function CoverPin({
   const [vh, setVh] = useState(0);
   const [top, setTop] = useState(0);
 
+  // Cinematic Übergänge nur am Desktop (≥ lg). Auf Handy/Tablet werden die
+  // Sektionen einfach gestapelt (nativ + smooth gescrollt) — kein Pinning,
+  // kein Zoom-/Wipe-Effekt. Default false → mobile-first, Desktop schaltet
+  // nach dem Mount hoch.
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
   useEffect(() => {
     const el = stickyRef.current;
     if (!el) return;
@@ -98,7 +111,10 @@ export function CoverPin({
   const wipeOpacity = useTransform(p, [0, 0.9], [1, 0.5]);
   const dim = useTransform(p, [0, 0.9], [0, 0.7]);
 
-  if (reduce) {
+  // Reduced-Motion ODER Nicht-Desktop → einfache, gestapelte Sektion ohne
+  // Pinning/Zoom/Wipe. Der Container behält data-coverpin, damit Anker-Sprünge
+  // (SmoothScroll) weiterhin sauber das Sektions-Element ansteuern.
+  if (reduce || !isDesktop) {
     return (
       <div data-coverpin className={`relative ${className ?? ''}`} style={{ zIndex: z }}>
         {children}
