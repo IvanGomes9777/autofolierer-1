@@ -49,6 +49,17 @@ function Stars({
   );
 }
 
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+// Echte, vom Kunden bestätigte Vertrauens-Belege (keine erfundenen Kennzahlen).
+const trust = ['Seit 2026 in Münster', 'Rückstandslos entfernbar'] as const;
+
 export function Rezension() {
   const review = reviews[0];
   const initials = review.author
@@ -71,15 +82,6 @@ export function Rezension() {
       <div aria-hidden="true" className="hero-grain absolute inset-0" />
 
       <div className="relative mx-auto w-full max-w-xl px-[clamp(1.25rem,5vw,3.5rem)] text-center">
-        <motion.p
-          variants={reveal}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.6 }}
-          className="eyebrow"
-        >
-          Bewertungen
-        </motion.p>
         <motion.h2
           variants={reveal}
           initial="hidden"
@@ -106,6 +108,22 @@ export function Rezension() {
             · {site.rating.count} {site.rating.source}-Bewertung
           </span>
         </motion.p>
+
+        {/* Vertrauens-Belege (echte Fakten) */}
+        <motion.ul
+          variants={reveal}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.6 }}
+          className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 text-sm text-paper-dim"
+        >
+          {trust.map((t) => (
+            <li key={t} className="flex items-center gap-2">
+              <CheckIcon className="h-4 w-4 shrink-0 text-olive-bright" />
+              {t}
+            </li>
+          ))}
+        </motion.ul>
 
         {/* Authentische Google-Rezensions-Karte */}
         <motion.figure
