@@ -7,6 +7,7 @@ const links = [
   { label: 'Leistungen', href: '#leistungen' },
   { label: 'Ergebnisse', href: '#ergebnisse' },
   { label: 'Portfolio', href: '#portfolio' },
+  { label: 'Bewertungen', href: '#rezension' },
   { label: 'Kontakt', href: '#kontakt' },
 ];
 
