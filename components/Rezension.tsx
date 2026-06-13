@@ -138,6 +138,28 @@ export function Rezension() {
             {review.text}
           </blockquote>
         </motion.figure>
+
+        {/* CTA: eigene Google-Bewertung abgeben */}
+        <motion.div
+          variants={reveal}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.6 }}
+          className="mt-8"
+        >
+          <a
+            href={site.rating.reviewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 rounded-full bg-paper px-6 py-3 text-[0.95rem] font-medium text-noir shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5a6305]"
+          >
+            <GoogleG className="h-5 w-5" />
+            Auf Google bewerten
+          </a>
+          <p className="mt-3 text-[0.8rem] text-paper-dim">
+            Zufrieden? Wir freuen uns über deine Rezension.
+          </p>
+        </motion.div>
       </div>
     </section>
   );
