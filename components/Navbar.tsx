@@ -37,7 +37,7 @@ export function Navbar() {
   return (
     <>
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
+      className={`fixed inset-x-0 top-0 z-[100] transition-colors duration-500 ${
         scrolled || open
           ? 'border-b border-[var(--line)] bg-[rgba(8,9,11,0.85)] backdrop-blur-md'
           : 'border-b border-transparent bg-gradient-to-b from-black/55 to-transparent'
@@ -99,17 +99,19 @@ export function Navbar() {
       <div
         id="mobile-menu"
         hidden={!open}
-        className={`fixed inset-0 z-[45] flex flex-col bg-noir transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-[95] overflow-y-auto bg-noir transition-opacity duration-300 lg:hidden ${
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         }`}
       >
-        <div className="wrap flex flex-1 flex-col justify-center gap-1 py-24">
+        {/* min-h-full + justify-center: zentriert bei genug Platz, scrollt sonst
+            (alle Links bleiben erreichbar). pt klärt die fixierte Navbar. */}
+        <div className="wrap flex min-h-full flex-col justify-center gap-1 pb-12 pt-28">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="border-b border-[var(--line)] py-5 font-playfair text-3xl text-paper transition-colors hover:text-[var(--olive-bright)]"
+              className="border-b border-[var(--line)] py-4 font-playfair text-[1.75rem] text-paper transition-colors hover:text-[var(--olive-bright)]"
             >
               {l.label}
             </a>
