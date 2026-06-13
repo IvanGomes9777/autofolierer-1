@@ -25,6 +25,13 @@ import {
  * bleibt das Scroll-Ziel (Runway) während des Scrollens konstant und die
  * Übergänge glitchen nicht mehr.
  */
+/**
+ * Anteil der Viewport-Höhe, über den der Cover-Übergang läuft (Runway).
+ * 1 = eine volle Bildschirmhöhe extra Scroll bis zur nächsten Section.
+ * Kleiner = die nächste Section kommt früher, der Übergang ist knackiger.
+ */
+const COVER = 0.55;
+
 export function CoverPin({
   children,
   z = 0,
@@ -94,10 +101,12 @@ export function CoverPin({
     };
   }, []);
 
-  // Fenster = exakt die Cover-Phase (nächste Section wandert über den Viewport)
+  // Fenster = exakt die Cover-Phase (nächste Section wandert über den Viewport).
+  // Das Animationsfenster ist an die verkürzte Runway gekoppelt (siehe COVER),
+  // damit der Übergang über genau diese Strecke 0→1 läuft.
   const { scrollYProgress: p } = useScroll({
     target: containerRef,
-    offset: ['end 200%', 'end 100%'],
+    offset: [`end ${100 + COVER * 100}%`, 'end 100%'],
   });
 
   // Zoom-Through
@@ -146,8 +155,13 @@ export function CoverPin({
           />
         )}
       </div>
-      {/* Cover-Runway: feste px-Höhe (mobil stabil, kein dvh-Resize beim Scrollen) */}
-      <div style={{ height: vh ? vh : undefined }} className={vh ? '' : 'h-[100svh]'} aria-hidden="true" />
+      {/* Cover-Runway: feste px-Höhe (mobil stabil, kein dvh-Resize beim Scrollen).
+          Verkürzt um den Faktor COVER → die nächste Section kommt früher. */}
+      <div
+        style={{ height: vh ? vh * COVER : undefined }}
+        className={vh ? '' : 'h-[55svh]'}
+        aria-hidden="true"
+      />
     </div>
   );
 }
