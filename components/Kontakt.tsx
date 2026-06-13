@@ -78,15 +78,6 @@ export function Kontakt() {
       <div aria-hidden="true" className="hero-grain absolute inset-0" />
 
       <div className="relative mx-auto w-full max-w-2xl px-[clamp(1.25rem,5vw,3.5rem)]">
-        <motion.p
-          variants={reveal}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.6 }}
-          className="eyebrow text-center"
-        >
-          Kontakt
-        </motion.p>
         <motion.h2
           variants={reveal}
           initial="hidden"

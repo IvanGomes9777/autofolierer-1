@@ -88,15 +88,6 @@ export function Standort() {
       <div aria-hidden="true" className="hero-grain absolute inset-0" />
 
       <div className="relative wrap">
-        <motion.p
-          variants={reveal}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.6 }}
-          className="eyebrow"
-        >
-          Standort
-        </motion.p>
         <motion.h2
           variants={reveal}
           initial="hidden"

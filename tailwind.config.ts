@@ -27,9 +27,10 @@ const config: Config = {
       fontFamily: {
         // Variant display/body fonts
         anton: ['var(--font-anton)', 'sans-serif'],
-        playfair: ['var(--font-playfair)', 'serif'],
-        // Legacy-Alias: font-display → Playfair (Display-Schrift des Projekts).
-        display: ['var(--font-playfair)', 'serif'],
+        // Display-Schrift des Projekts: Marcellus (ersetzt Playfair).
+        // Alias-Keys bleiben (playfair/display), damit Bestandscode unverändert erbt.
+        playfair: ['var(--font-marcellus)', 'serif'],
+        display: ['var(--font-marcellus)', 'serif'],
         montserrat: ['var(--font-montserrat)', 'sans-serif'],
         sora: ['var(--font-sora)', 'sans-serif'],
         bebas: ['var(--font-bebas)', 'sans-serif'],
